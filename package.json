@@ -1,0 +1,51 @@
+{
+  "name": "questionaire-api",
+  "version": "0.0.1",
+  "description": "The questionaire API.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "./node_modules/.bin/lab --leaks",
+    "allTests": "npm run acceptanceTest && npm run test",
+    "acceptanceTest": "cucumber-js ./features/*.feature",
+    "lint": "lab -d -L --leaks",
+    "coverage": "./node_modules/.bin/nyc --reporter=html npm run allTests",
+    "coverageCheck": "nyc --reporter=lcov --lines=100 --check-coverage=true npm run allTests"
+  },
+  "engines": {
+    "node": ">=12.16"
+  },
+  "author": "cliu7516@gmail.com",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@hapi/boom": "^9.0.0",
+    "@hapi/hapi": "^19.1.1",
+    "@hapi/hoek": "^9.0.3",
+    "@hapi/inert": "^6.0.1",
+    "@hapi/joi": "^17.1.0",
+    "@hapi/vision": "^6.0.0",
+    "@hapi/wreck": "^17.0.0",
+    "bcrypt": "^4.0.1",
+    "faker": "^4.1.0",
+    "hapi-pino": "^8.0.0",
+    "hapi-swagger": "^12.1.0",
+    "mongodb": "^3.5.7"
+  },
+  "devDependencies": {
+    "@hapi/code": "^8.0.1",
+    "@hapi/eslint-config-hapi": "^13.0.2",
+    "@hapi/lab": "^22.0.3",
+    "cucumber": "^6.0.5",
+    "mongo-unit": "^2.0.1",
+    "nodemon": "^2.0.2",
+    "nyc": "^15.0.0",
+    "proxyquire": "^2.1.3"
+  },
+  "nyc": {
+    "all": false,
+    "include": [
+      "api/**/*.js"
+    ]
+  }
+}
