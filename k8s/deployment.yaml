@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: questionaire-service
+  labels:
+    app: questionaire-service
+spec:
+  selector:
+    matchLabels:
+      app: questionaire-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: questionaire-service
+    spec:
+      containers:
+      - name: questionaire-service
+        image: ecaresystem/ocean-questionaire
+        imagePullPolicy: Always
+        ports:
+            - containerPort: 3004
+        env:
+            - name: ENV_LOGGING_LEVEL
+              value: "error"
+            - name: ENV_DB_URL
+              value: "mongodb://root:1jingluo!@dds-2zea539d75bbb7f41338-pub.mongodb.rds.aliyuncs.com:3717,dds-2zea539d75bbb7f42971-pub.mongodb.rds.aliyuncs.com:3717/admin?replicaSet=mgset-29216971"
+        # readinessProbe:
+        #     httpGet:
+        #         path: /health
+        #         port: 3000
+        #     initialDelaySeconds: 15
+        #     periodSeconds: 10
+        # livenessProbe:
+        #     httpGet:
+        #         path: /health
+        #         port: 3000
+        #     initialDelaySeconds: 15
+        #     periodSeconds: 10
+          
+status: {}  
+  
+  
+  
