@@ -15,7 +15,7 @@ const v1 = {
 
         server.route({
             method: 'GET',
-            path: '/questionaire/{conferenceId}',
+            path: '/questionaires/{conferenceId}',
             options: {
                 description: 'Retrieve questionaire for conference.',
                 tags: ['api'],
@@ -30,7 +30,7 @@ const v1 = {
 
         server.route({
             method: 'POST',
-            path: '/questionaire/{conferenceId}',
+            path: '/questionaires/{conferenceId}',
             options: {
                 description: 'Submit questionaire',
                 tags: ['api'],
