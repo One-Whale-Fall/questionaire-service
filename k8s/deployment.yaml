@@ -23,6 +23,8 @@ spec:
         env:
             - name: ENV_LOGGING_LEVEL
               value: "error"
+            - name: ENV_CONFERENCE_BASE_URL
+              value: "http://conference-service:3003/v1"
             - name: ENV_DB_URL
               value: "mongodb://root:1jingluo!@dds-2zea539d75bbb7f41338-pub.mongodb.rds.aliyuncs.com:3717,dds-2zea539d75bbb7f42971-pub.mongodb.rds.aliyuncs.com:3717/admin?replicaSet=mgset-29216971"
         # readinessProbe:

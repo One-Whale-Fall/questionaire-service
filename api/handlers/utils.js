@@ -1,6 +1,7 @@
 'use strict';
 
 const util = require('util');
+const Path = require('path');
 const FS = require('fs');
 const Hoek = require('@hapi/hoek');
 
@@ -30,7 +31,7 @@ const GetQuestionaire = async function (conferenceId) {
     if (!_questionaire) {
         const readFileAsync = util.promisify(FS.readFile);
         const configFileContent = await readFileAsync(Path.join(__dirname, '../../kvmnt/questionaireTemplate.json'), 'utf-8');
-        const _questionaire = JSON.parse(configFileContent);
+        _questionaire = JSON.parse(configFileContent);
         const commonOptions = require("../../kvmnt/commonOptions.json");
         _questionaire.questionItems.forEach(item => {
             item.options = Hoek.clone(commonOptions);

@@ -1,6 +1,8 @@
 'use strict'
 
+const Path = require('path');
 const Wreck = require('@hapi/wreck');
+const Hoek = require('@hapi/hoek');
 const Boom = require('@hapi/boom');
 const Config = require('../../config.js');
 const constants = require('../constants.js');
@@ -9,8 +11,8 @@ const Utils = require('../handlers/utils.js');
 const onSubmitQuestionaire = async function (request, h) {
 
     const userId = request.headers['acting-user'];
-    const getUserRegistrationUrl = new URL(Config.conferenceApiBaseUrl, `/conferences/${request.params.conferenceId}/registrations${userId}`);
-    const { payload } = await Wreck.get(getUserRegistrationUrl.href, {
+    const getUserRegistrationUrl = Path.join(Config.conferenceApiBaseUrl, `/conferences/${request.params.conferenceId}/registrations/${userId}`);
+    const { payload } = await Wreck.get(getUserRegistrationUrl, {
         json: true,
         headers: {
             'acting-organization': request.headers['acting-organization'],
@@ -19,16 +21,32 @@ const onSubmitQuestionaire = async function (request, h) {
         }
     });
     if (payload) {
-        //TODO check whether the user has submitted questionaire
-
         const mongoDbClient = await request.server.methods.getDbClient();
         const db = mongoDbClient.db(Config.dbName);
         const collection = db.collection(constants.QUESTIONAIRE_COLLECTION);
+        const existingSubmission = await collection.findOne({
+            conferenceId: request.params.conferenceId,
+            userId: userId
+        });
+        if (existingSubmission) {
+            return h.response('Questionaire already submitted!').code(409);
+        }
+        const content = Hoek.clone(request.payload);
+        delete content.name;
+        content.questionItems.forEach(item => {
+            delete item.name;
+            item.options.forEach(x => {
+                delete x.name;
+            });
+        });
         await collection.insertOne({
             conferenceId: request.params.conferenceId,
             userId: userId,
-            ...request.payload
+            ...content
         });
+        return h.response('Questionaire submitted.').code(200);
+    } else {
+        h.response('User registration not found!').code(404);
     }
 };
 

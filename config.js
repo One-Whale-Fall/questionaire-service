@@ -29,7 +29,7 @@ class systemConfig {
     }
     get conferenceApiBaseUrl() {
 
-        return process.env.ENV_ORGANIZATION_BASE_URL || 'http://conference-service';
+        return process.env.ENV_CONFERENCE_BASE_URL || 'http://localhost:3003/v1';
     }
 }
 
