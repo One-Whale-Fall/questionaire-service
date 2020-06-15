@@ -13,7 +13,7 @@ class systemConfig {
     }
     get port() {
 
-        return   3000;
+        return   3004;
     }
     get loggingLevel() {
 
