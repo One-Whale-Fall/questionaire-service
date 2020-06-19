@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: questionaire-service
-        image: ecaresystem/ocean-questionaire
+        image: ecaresystem/ocean-questionaire:#{DOCKER_TAG}#
         imagePullPolicy: Always
         ports:
             - containerPort: 3004

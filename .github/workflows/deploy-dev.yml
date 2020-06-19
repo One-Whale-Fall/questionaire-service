@@ -10,6 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: get-npm-version
+      id: package-version
+      uses: martinbeentjes/npm-get-version-action@master
+    - uses: cschleiden/replace-tokens@v1
+      with:
+        files: '["k8s/*.yaml"]'
+      env:
+        DOCKER_TAG: ${{ steps.package-version.outputs.current-version}}
     - uses: danielr1996/kubectl-action@1.0.0
       name: Deploy
       with:
