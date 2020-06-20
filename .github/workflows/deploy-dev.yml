@@ -18,6 +18,7 @@ jobs:
         files: '["k8s/*.yaml"]'
       env:
         DOCKER_TAG: ${{ steps.package-version.outputs.current-version}}
+        INSTANCE_NUM: 1
     - uses: danielr1996/kubectl-action@1.0.0
       name: Deploy
       with:

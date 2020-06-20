@@ -8,7 +8,7 @@ spec:
   selector:
     matchLabels:
       app: questionaire-service
-  replicas: 1
+  replicas: #{INSTANCE_NUM}#
   template:
     metadata:
       labels:

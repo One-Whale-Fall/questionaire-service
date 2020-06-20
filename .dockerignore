@@ -1,0 +1,7 @@
+node_modules/
+.git/
+.github/
+.gitignore
+test-output/
+.nyc_output/
+k8s/
