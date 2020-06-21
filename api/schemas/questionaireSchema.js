@@ -59,7 +59,8 @@ const submitQuestionaireReponse = {
 
     status: {
         201: Joi.any(),
-        404: Joi.any()
+        404: Joi.any(),
+        409: Joi.any()
     }
 };
 

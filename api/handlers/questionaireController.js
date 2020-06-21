@@ -8,10 +8,28 @@ const Config = require('../../config.js');
 const constants = require('../constants.js');
 const Utils = require('../handlers/utils.js');
 
+const updateQuestionaireStats = function (questionaire, submission) {
+
+    submission.questionItems.forEach(questionItem => {
+        const selected = questionItem.options.find(x=>x.selected);
+        const matchedItem = questionaire.questionItems.find(x=>x.id === questionItem.id);
+        if (matchedItem) {
+            matchedItem.options.forEach(x => {
+                if (x.order === selected.order) {
+                    if (x.num)
+                        x.num++;
+                    else
+                        x.num = 1;
+                }
+            });
+        }
+    });
+};
+
 const onSubmitQuestionaire = async function (request, h) {
 
     const userId = request.headers['acting-user'];
-    const getUserRegistrationUrl = Path.join(Config.conferenceApiBaseUrl, `/conferences/${request.params.conferenceId}/registrations/${userId}`);
+    const getUserRegistrationUrl = Config.conferenceApiBaseUrl + `/conferences/${request.params.conferenceId}/registrations/${userId}`;
     const { payload } = await Wreck.get(getUserRegistrationUrl, {
         json: true,
         headers: {
@@ -23,41 +41,50 @@ const onSubmitQuestionaire = async function (request, h) {
     if (payload) {
         const mongoDbClient = await request.server.methods.getDbClient();
         const db = mongoDbClient.db(Config.dbName);
-        const collection = db.collection(constants.QUESTIONAIRE_COLLECTION);
-        const existingSubmission = await collection.findOne({
+        const userSubmissionCollection = db.collection(constants.USER_QUESTIONAIRE_COLLECTION);
+        const existingSubmission = await userSubmissionCollection.findOne({
             conferenceId: request.params.conferenceId,
             userId: userId
         });
         if (existingSubmission) {
             return h.response('Questionaire already submitted!').code(409);
         }
-        const content = Hoek.clone(request.payload);
-        delete content.name;
-        content.questionItems.forEach(item => {
-            delete item.name;
-            item.options.forEach(x => {
-                delete x.name;
-            });
-        });
-        await collection.insertOne({
-            conferenceId: request.params.conferenceId,
-            userId: userId,
-            ...content
-        });
-        return h.response('Questionaire submitted.').code(200);
+        const questionaire = await getQuestionaireByConferenceId(db, request.params.conferenceId);
+        if (questionaire) {
+            updateQuestionaireStats(questionaire, request.payload);
+            const collection = db.collection(constants.QUESTIONAIRE_COLLECTION);
+            await collection.replaceOne({
+                _id: questionaire._id
+            }, questionaire);
+
+            await userSubmissionCollection.insertOne({
+                conferenceId: request.params.conferenceId,
+                userId: userId
+            })
+        } else {
+            return h.response('Questionaire is not found!').code(404);
+        }
+        return h.response('Questionaire submitted.').code(201);
     } else {
-        h.response('User registration not found!').code(404);
+        return h.response('User registration not found!').code(404);
     }
+};
+
+const getQuestionaireByConferenceId = async function(db, conferenceId) {
+
+    const collection = db.collection(constants.QUESTIONAIRE_COLLECTION);
+    const questionaire = await collection.findOne({
+        conferenceId
+    });
+
+    return questionaire;
 };
 
 const onGetQuestionaire = async function (request, h) {
 
     const mongoDbClient = await request.server.methods.getDbClient();
     const db = mongoDbClient.db(Config.dbName);
-    const collection = db.collection(constants.QUESTIONAIRE_COLLECTION);
-    const questionaire = await collection.findOne({
-        conferenceId: request.params.conferenceId
-    });
+    const questionaire = await getQuestionaireByConferenceId(db, request.params.conferenceId);
     if (questionaire) {
         delete questionaire._id;
         return h.response(questionaire).code(200);
