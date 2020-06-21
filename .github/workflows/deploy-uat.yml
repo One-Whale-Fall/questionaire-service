@@ -1,13 +1,14 @@
 name: questionaire service CD for uat
 
 on:
-  watch:
-    types: [started]
+  release:
+    types: [published]
 
 jobs:
   deploy:
     name: Deploy to cluster
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/uat-release') == true
     steps:
     - uses: actions/checkout@v2
     - name: get-npm-version
