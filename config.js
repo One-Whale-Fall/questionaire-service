@@ -25,7 +25,7 @@ class systemConfig {
     }
     get dbName() {
 
-        return 'questionaire';
+        return process.env.ENV_DB_NAME || 'questionaire';
     }
     get conferenceApiBaseUrl() {
 
