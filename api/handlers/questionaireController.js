@@ -52,12 +52,36 @@ const onSubmitQuestionaire = async function (request, h) {
 
 const onGetQuestionaire = async function (request, h) {
 
-    const questionaire = await Utils.GetQuestionaire(request.params.conferenceId);
+    const mongoDbClient = await request.server.methods.getDbClient();
+    const db = mongoDbClient.db(Config.dbName);
+    const collection = db.collection(constants.QUESTIONAIRE_COLLECTION);
+    const questionaire = await collection.findOne({
+        conferenceId: request.params.conferenceId
+    });
     if (questionaire) {
+        delete questionaire._id;
         return h.response(questionaire).code(200);
     }
 
     return h.response('Questionaire not found!').code(404);
+};
+
+const onGenerateQuestionaire = async function (request, h) {
+
+    const mongoDbClient = await request.server.methods.getDbClient();
+    const db = mongoDbClient.db(Config.dbName);
+    const collection = db.collection(constants.QUESTIONAIRE_COLLECTION);
+    const existingQuestionaire = await collection.findOne({
+        conferenceId: request.params.conferenceId
+    });
+    if (existingQuestionaire)
+        return h.response('The questionaire has been created!').code(400);
+    const questionaire = await Utils.GetQuestionaire(request.params.conferenceId);
+    await collection.insertOne({
+        conferenceId: request.params.conferenceId,
+        ...questionaire
+    });
+    return h.response('Questionaire created!').code(201);
 };
 
 const submitQuestionaire = async function (request, h) {
@@ -78,7 +102,17 @@ const getQuestionaire = async function (request, h) {
     }
 };
 
+const generateQuestionaire = async function (request, h) {
+
+    try {
+        return await onGenerateQuestionaire(request, h);
+    } catch (error) {
+        throw Boom.internal();
+    }
+};
+
 module.exports = {
     getQuestionaire,
     submitQuestionaire,
+    generateQuestionaire
 };

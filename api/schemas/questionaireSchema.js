@@ -29,19 +29,19 @@ const questionAnswerOptionItem = Joi.object({
     order: Joi.number().integer().required(),
     name: Joi.string().required().description('选项名称'),
     selected: Joi.boolean().optional().default(false).description('问卷名称'),
-});
+}).unknown(true);
 
 const questionaireItemSchema = Joi.object({
     id: Joi.string().required(),
     order: Joi.number().integer().required(),
     name: Joi.string().required().description('问题'),
     options: Joi.array().items(questionAnswerOptionItem).description('问题选项')
-});
+}).unknown(true);
 
 const questionaireUserView = Joi.object({
     name: Joi.string().required().description('问卷名称'),
     questionItems: Joi.array().items(questionaireItemSchema)
-});
+}).unknown(true);
 
 const submitQuestionaireRequest = Joi.object({
     name: Joi.string().required().description('问卷名称'),
@@ -49,10 +49,9 @@ const submitQuestionaireRequest = Joi.object({
 });
 
 const getQuestionaireResponse = {
-
     status: {
-        200: Joi.any(),
-        404: questionaireUserView
+        200: questionaireUserView,
+        400: Joi.any()
     }
 };
 
@@ -64,9 +63,18 @@ const submitQuestionaireReponse = {
     }
 };
 
+const generateQuestionaireResponse = {
+
+    status: {
+        201: Joi.any(),
+        400: Joi.any()
+    }
+};
+
 module.exports = {
 
     submitQuestionaireRequest,
     getQuestionaireResponse,
-    submitQuestionaireReponse
+    submitQuestionaireReponse,
+    generateQuestionaireResponse
 };

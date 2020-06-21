@@ -6,12 +6,29 @@ const Pack = require('../../package.json');
 const { sendValidationFailResponse } = require('../handlers/utils.js');
 const questionaireSchema = require('../schemas/questionaireSchema.js');
 const { commonHeaders } = require('../schemas/common.js');
-const { getQuestionaire, submitQuestionaire } = require('../handlers/questionaireController.js');
+const { getQuestionaire, submitQuestionaire, generateQuestionaire } = require('../handlers/questionaireController.js');
 
 const v1 = {
     name: 'v1',
     version: Pack.version,
     register: function (server, options) {
+
+        server.route({
+            method: 'POST',
+            path: '/internal/questionaires/{conferenceId}',
+            options: {
+                description: 'To generate questionaire for conference. By design only used by internal process/job.Not to be exposed through API gateway.',
+                tags: ['api'],
+                validate: {
+                    params: Joi.object({
+                        conferenceId: Joi.string().required()
+                    }),
+                    failAction: sendValidationFailResponse
+                },
+                response: questionaireSchema.generateQuestionaireResponse,
+                handler: generateQuestionaire
+            }
+        });
 
         server.route({
             method: 'GET',
@@ -21,6 +38,9 @@ const v1 = {
                 tags: ['api'],
                 validate: {
                     headers: commonHeaders,
+                    params: Joi.object({
+                        conferenceId: Joi.string().required()
+                    }),
                     failAction: sendValidationFailResponse
                 },
                 response: questionaireSchema.getQuestionaireResponse,
@@ -37,6 +57,9 @@ const v1 = {
                 validate: {
                     payload: questionaireSchema.submitQuestionaireRequest,
                     headers: commonHeaders,
+                    params: Joi.object({
+                        conferenceId: Joi.string().required()
+                    }),
                     failAction: sendValidationFailResponse
                 },
                 response: questionaireSchema.submitQuestionaireReponse,
