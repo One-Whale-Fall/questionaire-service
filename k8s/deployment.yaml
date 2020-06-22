@@ -32,6 +32,8 @@ spec:
                 secretKeyRef:
                   name: ocean-config
                   key: db-url
+            - name: aliyun_logs_#{LOG_STORE}#
+              value: stdout
         # readinessProbe:
         #     httpGet:
         #         path: /health

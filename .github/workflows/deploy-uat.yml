@@ -21,6 +21,7 @@ jobs:
         DOCKER_TAG: ${{ steps.package-version.outputs.current-version}}
         INSTANCE_NUM: 1
         DB_NAME: uat-questionaire
+        LOG_STORE: uat-logs
     - uses: danielr1996/kubectl-action@1.0.0
       name: Deploy
       with:
