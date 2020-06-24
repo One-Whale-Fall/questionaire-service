@@ -31,6 +31,10 @@ class systemConfig {
 
         return process.env.ENV_CONFERENCE_BASE_URL || 'http://localhost:3003/v1';
     }
+    get responseFailValidationAction() {
+
+        return process.env.ENV_RESPONSE_FAIL_VALIDATION_ACTION || 'log';
+    }
 }
 
 module.exports = new systemConfig();

@@ -1,7 +1,7 @@
 'use strict';
 
 const Joi = require('@hapi/joi');
-const Hoek = require('@hapi/hoek');
+const Config = require('../../config.js');
 
 // const questionCategory = Joi.object({
 //     name: Joi.string().required().description('指标名称'),
@@ -52,7 +52,8 @@ const getQuestionaireResponse = {
     status: {
         200: questionaireUserView,
         400: Joi.any()
-    }
+    },
+    failAction: Config.responseFailValidationAction
 };
 
 const submitQuestionaireReponse = {
@@ -61,7 +62,8 @@ const submitQuestionaireReponse = {
         201: Joi.any(),
         404: Joi.any(),
         409: Joi.any()
-    }
+    },
+    failAction: Config.responseFailValidationAction
 };
 
 const generateQuestionaireResponse = {
@@ -69,7 +71,8 @@ const generateQuestionaireResponse = {
     status: {
         201: Joi.any(),
         400: Joi.any()
-    }
+    },
+    failAction: Config.responseFailValidationAction
 };
 
 module.exports = {
