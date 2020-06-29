@@ -46,7 +46,14 @@ spec:
         #         port: 3000
         #     initialDelaySeconds: 15
         #     periodSeconds: 10
-          
+        volumeMounts:
+          - name: tz-config
+            mountPath: /etc/localtime
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/PRC
+            type: File
 status: {}  
   
   
