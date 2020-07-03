@@ -35,7 +35,8 @@ const questionaireItemSchema = Joi.object({
     id: Joi.string().required(),
     order: Joi.number().integer().required(),
     name: Joi.string().required().description('问题'),
-    options: Joi.array().items(questionAnswerOptionItem).description('问题选项')
+    options: Joi.array().items(questionAnswerOptionItem).description('问题选项'),
+    result: Joi.number().optional().description('问题得分')
 }).unknown(true);
 
 const questionaireUserView = Joi.object({
@@ -49,6 +50,14 @@ const submitQuestionaireRequest = Joi.object({
 });
 
 const getQuestionaireResponse = {
+    status: {
+        200: questionaireUserView,
+        400: Joi.any()
+    },
+    failAction: Config.responseFailValidationAction
+};
+
+const questionaireResultResponse = {
     status: {
         200: questionaireUserView,
         400: Joi.any()
@@ -80,5 +89,6 @@ module.exports = {
     submitQuestionaireRequest,
     getQuestionaireResponse,
     submitQuestionaireReponse,
-    generateQuestionaireResponse
+    generateQuestionaireResponse,
+    questionaireResultResponse
 };
