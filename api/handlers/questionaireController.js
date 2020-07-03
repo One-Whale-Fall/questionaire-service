@@ -122,47 +122,48 @@ const onGetQuestionaireResult = async function (request, h) {
     if (existingQuestionaire) {
         const { questionItems } = existingQuestionaire;
         const questionaireResult = questionItems.reduce((acc, item) => {
-          const { options, weight, order } = item;
-          const excludeOrders = [9, 20, 21];
-          let result;
-          if (excludeOrders.includes(order)) {
-            result = null;
-          }
-          const itemTotal = options.reduce((acc, option) => {
-            const { num } = option;
-            acc.userCount += num || 0;
-            let value;
-            switch (option.name) {
-              case '完全不同意': 
-                value = 0;
-                break;
-              case '比较不同意':
-                value = 25;
-                break;
-              case '一般同意':
-                value = 50;
-                break;
-              case '比较同意':
-                value = 75;
-                break;
-              case '完全同意':
-                value = 100;
-                break;
+            const { options, weight, order } = item;
+            const excludeOrders = [9, 20, 21];
+            let result;
+            if (excludeOrders.includes(order)) {
+                result = null;
+            } else {
+                const itemTotal = options.reduce((acc, option) => {
+                    const { num } = option;
+                    acc.userCount += num || 0;
+                    let value;
+                    switch (option.name) {
+                      case '完全不同意': 
+                        value = 0;
+                        break;
+                      case '比较不同意':
+                        value = 25;
+                        break;
+                      case '一般同意':
+                        value = 50;
+                        break;
+                      case '比较同意':
+                        value = 75;
+                        break;
+                      case '完全同意':
+                        value = 100;
+                        break;
+                    }
+                    acc.score += value * num || 0;
+                    return acc;
+                }, { userCount: 0, score: 0 });
+                const average = itemTotal.score / itemTotal.userCount;
+                result = Math.round(average * weight * 100) / 100;
             }
-            acc.score += value * num || 0;
+            acc.push({
+                id: item.id,
+                order,
+                name: item.name,
+                options,
+                weight,
+                result
+            });
             return acc;
-          }, { userCount: 0, score: 0 });
-          const average = itemTotal.score / itemTotal.userCount;
-          result = Math.round(average * weight * 100) / 100;
-          acc.push({
-            id: item.id,
-            order,
-            name: item.name,
-            options,
-            weight,
-            result
-          });
-          return acc;
         }, []);
         existingQuestionaire.questionItems = questionaireResult
         delete existingQuestionaire._id;
