@@ -155,7 +155,7 @@ const onGetQuestionaireResult = async function (request, h) {
                     return acc;
                 }, { userCount: 0, score: 0 });
                 result = Math.round(itemTotal.score / itemTotal.userCount * 100) / 100;
-                weightedResult = result * weight * 100;
+                weightedResult = Math.round(result * weight * 100) / 100;
             }
             acc.push({
                 id: item.id,
