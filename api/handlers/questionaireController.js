@@ -125,7 +125,9 @@ const onGetQuestionaireResult = async function (request, h) {
             const { options, weight, order } = item;
             const excludeOrders = [9, 20, 21];
             let result;
+            let weightedResult;
             if (excludeOrders.includes(order)) {
+                weightedResult = null;
                 result = null;
             } else {
                 const itemTotal = options.reduce((acc, option) => {
@@ -152,8 +154,8 @@ const onGetQuestionaireResult = async function (request, h) {
                     acc.score += value * num || 0;
                     return acc;
                 }, { userCount: 0, score: 0 });
-                const average = itemTotal.score / itemTotal.userCount;
-                result = Math.round(average * weight * 100) / 100;
+                result = Math.round(itemTotal.score / itemTotal.userCount * 100) / 100;
+                weightedResult = result * weight * 100;
             }
             acc.push({
                 id: item.id,
@@ -161,7 +163,8 @@ const onGetQuestionaireResult = async function (request, h) {
                 name: item.name,
                 options,
                 weight,
-                result
+                result,
+                weightedResult
             });
             return acc;
         }, []);

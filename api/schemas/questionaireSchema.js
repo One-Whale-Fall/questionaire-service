@@ -36,7 +36,8 @@ const questionaireItemSchema = Joi.object({
     order: Joi.number().integer().required(),
     name: Joi.string().required().description('问题'),
     options: Joi.array().items(questionAnswerOptionItem).description('问题选项'),
-    result: Joi.number().optional().description('问题得分')
+    result: Joi.number().optional().description('问题得分'),
+    weightedResult: Joi.number().optional().describe('问题权重后得分')
 }).unknown(true);
 
 const questionaireUserView = Joi.object({
