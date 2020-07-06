@@ -27,7 +27,6 @@ const updateQuestionaireStats = function (questionaire, submission) {
 };
 
 const onSubmitQuestionaire = async function (request, h) {
-    return h.response('123').code(200)
     const userId = request.headers['acting-user'];
     const getUserRegistrationUrl = Config.conferenceApiBaseUrl + `/conferences/${request.params.conferenceId}/registrations/${userId}`;
     const { payload } = await Wreck.get(getUserRegistrationUrl, {
