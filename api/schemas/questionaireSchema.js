@@ -69,6 +69,7 @@ const questionaireResultResponse = {
 const submitQuestionaireReponse = {
 
     status: {
+        200: Joi.any(),
         201: Joi.any(),
         404: Joi.any(),
         409: Joi.any()
