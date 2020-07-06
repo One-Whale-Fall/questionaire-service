@@ -34,18 +34,18 @@ spec:
                   key: db-url
             - name: aliyun_logs_#{LOG_STORE}#
               value: stdout
-        # readinessProbe:
-        #     httpGet:
-        #         path: /health
-        #         port: 3000
-        #     initialDelaySeconds: 15
-        #     periodSeconds: 10
-        # livenessProbe:
-        #     httpGet:
-        #         path: /health
-        #         port: 3000
-        #     initialDelaySeconds: 15
-        #     periodSeconds: 10
+        readinessProbe:
+            httpGet:
+                path: /health
+                port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+        livenessProbe:
+            httpGet:
+                path: /health
+                port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
         volumeMounts:
           - name: tz-config
             mountPath: /etc/localtime

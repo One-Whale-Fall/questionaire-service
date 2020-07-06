@@ -58,7 +58,8 @@ const onSubmitQuestionaire = async function (request, h) {
 
             await userSubmissionCollection.insertOne({
                 conferenceId: request.params.conferenceId,
-                userId: userId
+                userId: userId,
+                questionItems: request.payload.questionItems
             })
         } else {
             return h.response('Questionaire is not found!').code(404);
@@ -182,6 +183,7 @@ const submitQuestionaire = async function (request, h) {
         if (error.output.payload.statusCode === 404) {
           return h.response('User registration not found!').code(404);
         }
+        request.log('error', error);
         throw Boom.internal();
     }
 };
@@ -191,6 +193,7 @@ const getQuestionaire = async function (request, h) {
     try {
         return await onGetQuestionaire(request, h);
     } catch (error) {
+        request.log('error', error);
         throw Boom.internal();
     }
 };
@@ -200,6 +203,7 @@ const generateQuestionaire = async function (request, h) {
     try {
         return await onGenerateQuestionaire(request, h);
     } catch (error) {
+        request.log('error', error);
         throw Boom.internal();
     }
 };
@@ -209,6 +213,7 @@ const getQuestionaireResult = async function (request, h) {
     try {
         return await onGetQuestionaireResult(request, h)
     } catch(error) {
+        request.log('error', error);
         throw Boom.internal();
     }
 }
