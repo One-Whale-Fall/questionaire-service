@@ -29,6 +29,7 @@ const updateQuestionaireStats = function (questionaire, submission) {
 const onSubmitQuestionaire = async function (request, h) {
 
     const userId = request.headers['acting-user'];
+    return userId
     const getUserRegistrationUrl = Config.conferenceApiBaseUrl + `/conferences/${request.params.conferenceId}/registrations/${userId}`;
     const { payload } = await Wreck.get(getUserRegistrationUrl, {
         json: true,
@@ -180,10 +181,9 @@ const submitQuestionaire = async function (request, h) {
     try {
         return await onSubmitQuestionaire(request, h);
     } catch (error) {
-        // if (error.output.payload.statusCode === 404) {
-        //   return h.response('User registration not found!').code(404);
-        // }
-        return h.response(error).code(400)
+        if (error.output.payload.statusCode === 404) {
+          return h.response('User registration not found!').code(404);
+        }
         throw Boom.internal();
     }
 };
