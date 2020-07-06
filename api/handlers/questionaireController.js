@@ -180,6 +180,9 @@ const submitQuestionaire = async function (request, h) {
     try {
         return await onSubmitQuestionaire(request, h);
     } catch (error) {
+        if (error.output.payload.statusCode === 404) {
+          return h.response('User registration not found!').code(404);
+        }
         throw Boom.internal();
     }
 };
@@ -207,7 +210,6 @@ const getQuestionaireResult = async function (request, h) {
     try {
         return await onGetQuestionaireResult(request, h)
     } catch(error) {
-        console.log('re', error)
         throw Boom.internal();
     }
 }
