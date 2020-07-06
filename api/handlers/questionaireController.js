@@ -183,8 +183,7 @@ const submitQuestionaire = async function (request, h) {
         if (error.output.payload.statusCode === 404) {
           return h.response('User registration not found!').code(404);
         } else {
-          const userId = request.headers['acting-user'];
-          return h.response(userId).code(400)
+          return h.response(error).code(400)
         }
         throw Boom.internal();
     }
