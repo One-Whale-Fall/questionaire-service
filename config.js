@@ -9,7 +9,7 @@ class systemConfig {
     get swaggerHost() {
 
         //TODO should return the realy URL deployed to cloud
-        return `0.0.0.0:${this.port}`;
+        return `localhost:${this.port}`;
     }
     get port() {
 
