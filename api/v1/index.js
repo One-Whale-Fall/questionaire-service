@@ -6,7 +6,9 @@ const Pack = require('../../package.json');
 const { sendValidationFailResponse } = require('../handlers/utils.js');
 const questionaireSchema = require('../schemas/questionaireSchema.js');
 const { commonHeaders } = require('../schemas/common.js');
-const { getQuestionaire, submitQuestionaire, generateQuestionaire, getQuestionaireResult } = require('../handlers/questionaireController.js');
+const {
+    getQuestionaire, submitQuestionaire, generateQuestionaire, getQuestionaireResult, getQuestionairesSummary
+} = require('../handlers/questionaireController.js');
 
 const v1 = {
     name: 'v1',
@@ -83,7 +85,22 @@ const v1 = {
                 response: questionaireSchema.questionaireResultResponse,
                 handler: getQuestionaireResult
             }
-        })
+        });
+
+        server.route({
+            method: 'GET',
+            path: '/questionaires/summary',
+            options: {
+                description: 'Get questionaires scores of all conferences',
+                tags: ['api'],
+                validate: {
+                    headers: commonHeaders,
+                    failAction: sendValidationFailResponse
+                },
+                response: questionaireSchema.questionairesSummaryResponse,
+                handler: getQuestionairesSummary
+            }
+        });
     }
 };
 

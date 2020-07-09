@@ -216,11 +216,40 @@ const getQuestionaireResult = async function (request, h) {
         request.log('error', error);
         throw Boom.internal();
     }
-}
+};
+
+const onGetQuestionairesSummary = async function (request, h) {
+
+    const mongoDbClient = await request.server.methods.getDbClient();
+    const db = mongoDbClient.db(Config.dbName);
+    const collection = db.collection(constants.QUESTIONAIRE_COLLECTION);
+    const questionaires = await collection.find().toArray();
+    const result = [];
+    for (const questionaire of questionaires) {
+        const scores = Utils.getQuestionaireResultSummary(questionaire);
+        const summary = {
+            conferenceId: questionaire.conferenceId,
+            ...scores
+        };
+        result.push(summary);
+    }
+    return h.response(result).code(200);
+};
+
+const getQuestionairesSummary = async function (request, h) {
+
+    try {
+        return await onGetQuestionairesSummary(request, h)
+    } catch(error) {
+        request.log('error', error);
+        throw Boom.internal();
+    }
+};
 
 module.exports = {
     getQuestionaire,
     submitQuestionaire,
     generateQuestionaire,
-    getQuestionaireResult
+    getQuestionaireResult,
+    getQuestionairesSummary
 };

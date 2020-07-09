@@ -86,11 +86,26 @@ const generateQuestionaireResponse = {
     failAction: Config.responseFailValidationAction
 };
 
+const questionaireSummaryItem = Joi.object({
+    conferenceId: Joi.string().required(),
+    totalScore: Joi.number().optional(),
+    academicScore: Joi.number().optional()
+});
+
+const questionairesSummaryResponse = {
+
+    status: {
+        200: Joi.array().items(questionaireSummaryItem)
+    },
+    failAction: Config.responseFailValidationAction
+};
+
 module.exports = {
 
     submitQuestionaireRequest,
     getQuestionaireResponse,
     submitQuestionaireReponse,
     generateQuestionaireResponse,
-    questionaireResultResponse
+    questionaireResultResponse,
+    questionairesSummaryResponse
 };

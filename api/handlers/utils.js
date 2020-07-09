@@ -40,9 +40,39 @@ const GetQuestionaire = async function (conferenceId) {
     return _questionaire;
 };
 
+const getQuestionaireResultSummary = function (questionaire) {
+
+    var totalScore = 0;
+    var academicScore = 0;
+    for (const questionItem of questionaire.questionItems) {
+        const weight = questionItem.weight;
+        if (!weight) {
+            continue;
+        }
+        var totalVotes = 0;
+        var itemTotal = 0;
+        for (const option of questionItem.options) {
+            totalVotes += option.num || 0;
+            itemTotal += (option.num || 0) * 25 * (option.order - 1);
+        }
+        if (totalVotes > 0) {
+            totalScore += weight * itemTotal / totalVotes;
+            if (questionItem.order <=8) {
+                academicScore += weight * itemTotal / totalVotes;
+            }
+        }
+    }
+
+    return {
+        totalScore,
+        academicScore
+    };
+};
+
 module.exports = {
     validate,
     sendValidationFailResponse,
     convertFieldsToString,
-    GetQuestionaire
+    GetQuestionaire,
+    getQuestionaireResultSummary
 };
