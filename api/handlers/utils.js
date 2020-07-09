@@ -44,6 +44,8 @@ const getQuestionaireResultSummary = function (questionaire) {
 
     var totalScore = 0;
     var academicScore = 0;
+    var achievementScore = 0;
+    var organizationScore = 0;
     for (const questionItem of questionaire.questionItems) {
         const weight = questionItem.weight;
         if (!weight) {
@@ -59,13 +61,19 @@ const getQuestionaireResultSummary = function (questionaire) {
             totalScore += weight * itemTotal / totalVotes;
             if (questionItem.order <=8) {
                 academicScore += weight * itemTotal / totalVotes;
+            } else if (questionItem.order >= 10 && questionItem.order <= 13) {
+                achievementScore += weight * itemTotal / totalVotes;
+            } else if (questionItem.order >= 14 && questionItem.order <= 19) {
+                organizationScore += weight * itemTotal / totalVotes;
             }
         }
     }
 
     return {
         totalScore,
-        academicScore
+        academicScore,
+        achievementScore,
+        organizationScore
     };
 };
 

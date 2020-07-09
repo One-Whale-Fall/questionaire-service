@@ -89,7 +89,9 @@ const generateQuestionaireResponse = {
 const questionaireSummaryItem = Joi.object({
     conferenceId: Joi.string().required(),
     totalScore: Joi.number().optional(),
-    academicScore: Joi.number().optional()
+    academicScore: Joi.number().optional(),
+    achievementScore: Joi.number().optional(),
+    organizationScore: Joi.number().optional()
 });
 
 const questionairesSummaryResponse = {
