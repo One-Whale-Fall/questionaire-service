@@ -23,13 +23,13 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm test
-    - name: get-npm-version
+    - name: Read version in package.json
       id: package-version
-      uses: martinbeentjes/npm-get-version-action@master
+      uses: tyankatsu0105/read-package-version-actions@v1
     - name: Build and Push to Docker Hub
       uses: docker/build-push-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: ecaresystem/ocean-questionaire
-        tags: latest, ${{ steps.package-version.outputs.current-version}}
+        tags: latest, ${{ steps.package-version.outputs.version}}
