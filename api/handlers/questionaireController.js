@@ -8,6 +8,7 @@ const Config = require('../../config.js');
 const constants = require('../constants.js');
 const Utils = require('../handlers/utils.js');
 const QRCode = require('qrcode')
+const { omit } = require('lodash')
 
 const updateQuestionaireStats = function (questionaire, submission) {
 
@@ -109,15 +110,41 @@ const onGenerateQuestionaire = async function (request, h) {
     });
     if (existingQuestionaire)
         return h.response('The questionaire has been created!').code(400);
-    const questionaire = await Utils.GetQuestionaire(request.params.id);
-    await collection.insertOne({
-        conferenceId: request.params.id,
-        ...questionaire
+    
+    const getConferenceUrl = Config.conferenceApiBaseUrl + `/conferences/${request.params.id}`;
+    const { payload } = await Wreck.get(getConferenceUrl, {
+        json: true,
+        headers: {
+            'acting-organization': request.headers['acting-organization'],
+            'acting-user': request.headers['acting-user'],
+            'acting-user-roles': request.headers['acting-user-roles'],
+        }
     });
-    const qrCode = await generateQRCode(request.params.id);
-    // await collection.updateOne({ _id : savedConference.insertedId }, 
-    //   {$set : { questionaireQRCode: qrCode }});
-    return h.response('Questionaire created!').code(201);
+    if (payload) {
+        const questionaire = await Utils.GetQuestionaire(request.params.id);
+        await collection.insertOne({
+            conferenceId: request.params.id,
+            ...questionaire
+        });
+        const qrCode = await generateQRCode(request.params.id);
+        payload.qrCode = qrCode;
+        payload.isQuestionaireGenerated = true;
+        payload.organizationId = payload.organization.id;
+        const omitProperties = ['_id', 'headOrganizationId', 'organization'];
+        const conference = omit(payload, omitProperties);
+        const updateConferenceUrl = Config.conferenceApiBaseUrl + `/conferences/${request.params.id}`;
+        await Wreck.put(updateConferenceUrl, {
+            headers: {
+                'acting-organization': request.headers['acting-organization'],
+                'acting-user': request.headers['acting-user'],
+                'acting-user-roles': request.headers['acting-user-roles'],
+            },
+            payload: conference
+        });
+        return h.response('Questionaire created!').code(201);
+    } else {
+        return h.response('Conference not found!').code(404);
+    }
 };
 
 
@@ -149,7 +176,8 @@ const generateQuestionaire = async function (request, h) {
     try {
         return await onGenerateQuestionaire(request, h);
     } catch (error) {
-        request.log('error', error);
+        console.log('>>>>', error)
+        // request.log('error', error);
         throw Boom.internal();
     }
 };

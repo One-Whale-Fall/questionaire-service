@@ -30,6 +30,7 @@
     "faker": "^4.1.0",
     "hapi-pino": "^8.0.0",
     "hapi-swagger": "^12.1.0",
+    "lodash": "^4.17.19",
     "mongodb": "^3.5.7",
     "qrcode": "^1.4.4"
   },
