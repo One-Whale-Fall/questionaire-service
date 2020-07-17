@@ -108,8 +108,8 @@ const onGenerateQuestionaire = async function (request, h) {
     const existingQuestionaire = await collection.findOne({
         conferenceId: request.params.id
     });
-    // if (existingQuestionaire)
-    //     return h.response('The questionaire has been created!').code(400);
+    if (existingQuestionaire)
+        return h.response('The questionaire has been created!').code(400);
     
     const getConferenceUrl = Config.conferenceApiBaseUrl + `/conferences/${request.params.id}`;
     const { payload } = await Wreck.get(getConferenceUrl, {
