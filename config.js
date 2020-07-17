@@ -21,6 +21,7 @@ class systemConfig {
     }
     get dbUrl() {
 
+      // return 'mongodb://root:1jingluo!@dds-2zea539d75bbb7f41338-pub.mongodb.rds.aliyuncs.com:3717,dds-2zea539d75bbb7f42971-pub.mongodb.rds.aliyuncs.com:3717/admin?replicaSet=mgset-29216971';
         return process.env.ENV_DB_URL || 'mongodb://localhost:27017';
     }
     get dbName() {
