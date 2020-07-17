@@ -23,6 +23,8 @@ spec:
         env:
             - name: ENV_LOGGING_LEVEL
               value: "error"
+            - name: CLIENT_BASE_URL
+              value: "http://ocean.ai4system.com"
             - name: ENV_CONFERENCE_BASE_URL
               value: "http://conference-service:3003/v1"
             - name: ENV_DB_NAME

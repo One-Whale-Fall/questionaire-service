@@ -7,6 +7,7 @@ const Boom = require('@hapi/boom');
 const Config = require('../../config.js');
 const constants = require('../constants.js');
 const Utils = require('../handlers/utils.js');
+const QRCode = require('qrcode')
 
 const updateQuestionaireStats = function (questionaire, submission) {
 
@@ -93,21 +94,29 @@ const onGetQuestionaire = async function (request, h) {
     return h.response('Questionaire not found!').code(404);
 };
 
+const generateQRCode = async function (conferenceId) {
+  const url = `${Config.clientBaseUrl}/public/questionaires/${conferenceId}`;
+  return QRCode.toDataURL(url)
+}
+
 const onGenerateQuestionaire = async function (request, h) {
 
     const mongoDbClient = await request.server.methods.getDbClient();
     const db = mongoDbClient.db(Config.dbName);
     const collection = db.collection(constants.QUESTIONAIRE_COLLECTION);
     const existingQuestionaire = await collection.findOne({
-        conferenceId: request.params.conferenceId
+        conferenceId: request.params.id
     });
     if (existingQuestionaire)
         return h.response('The questionaire has been created!').code(400);
-    const questionaire = await Utils.GetQuestionaire(request.params.conferenceId);
+    const questionaire = await Utils.GetQuestionaire(request.params.id);
     await collection.insertOne({
-        conferenceId: request.params.conferenceId,
+        conferenceId: request.params.id,
         ...questionaire
     });
+    const qrCode = await generateQRCode(request.params.id);
+    // await collection.updateOne({ _id : savedConference.insertedId }, 
+    //   {$set : { questionaireQRCode: qrCode }});
     return h.response('Questionaire created!').code(201);
 };
 

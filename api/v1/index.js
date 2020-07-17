@@ -17,13 +17,13 @@ const v1 = {
 
         server.route({
             method: 'POST',
-            path: '/internal/questionaires/{conferenceId}',
+            path: '/questionaires/conference/{id}',
             options: {
                 description: 'To generate questionaire for conference. By design only used by internal process/job.Not to be exposed through API gateway.',
                 tags: ['api'],
                 validate: {
                     params: Joi.object({
-                        conferenceId: Joi.string().required()
+                        id: Joi.string().required()
                     }),
                     failAction: sendValidationFailResponse
                 },

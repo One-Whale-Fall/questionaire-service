@@ -28,6 +28,10 @@ class systemConfig {
 
         return process.env.ENV_DB_NAME || 'questionaire';
     }
+    get clientBaseUrl() {
+
+        return process.env.CLIENT_BASE_URL || 'http://localhost:8080';
+    }
     get conferenceApiBaseUrl() {
 
         return process.env.ENV_CONFERENCE_BASE_URL || 'http://localhost:3003/v1';
