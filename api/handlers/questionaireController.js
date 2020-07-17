@@ -177,6 +177,5 @@ module.exports = {
     getQuestionaire,
     submitQuestionaire,
     generateQuestionaire,
-    getQuestionaireResult,
     getQuestionairesSummary
 };
