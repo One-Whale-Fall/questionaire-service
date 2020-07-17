@@ -127,7 +127,7 @@ const onGenerateQuestionaire = async function (request, h) {
             ...questionaire
         });
         const qrCode = await generateQRCode(request.params.id);
-        payload.qrCode = qrCode;
+        payload.questionaireQRCode = qrCode;
         payload.isQuestionaireGenerated = true;
         payload.organizationId = payload.organization.id;
         const omitProperties = ['_id', 'headOrganizationId', 'organization'];
