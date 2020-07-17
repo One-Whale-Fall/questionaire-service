@@ -108,8 +108,8 @@ const onGenerateQuestionaire = async function (request, h) {
     const existingQuestionaire = await collection.findOne({
         conferenceId: request.params.id
     });
-    if (existingQuestionaire)
-        return h.response('The questionaire has been created!').code(400);
+    // if (existingQuestionaire)
+    //     return h.response('The questionaire has been created!').code(400);
     
     const getConferenceUrl = Config.conferenceApiBaseUrl + `/conferences/${request.params.id}`;
     const { payload } = await Wreck.get(getConferenceUrl, {
@@ -130,7 +130,7 @@ const onGenerateQuestionaire = async function (request, h) {
         payload.questionaireQRCode = qrCode;
         payload.isQuestionaireGenerated = true;
         payload.organizationId = payload.organization.id;
-        const omitProperties = ['_id', 'headOrganizationId', 'organization'];
+        const omitProperties = ['_id', 'headOrganizationId', 'organization', 'numOfRegistrations'];
         const conference = omit(payload, omitProperties);
         const updateConferenceUrl = Config.conferenceApiBaseUrl + `/conferences/${request.params.id}`;
         await Wreck.put(updateConferenceUrl, {
