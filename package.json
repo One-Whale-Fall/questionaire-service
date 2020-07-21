@@ -1,6 +1,6 @@
 {
   "name": "questionaire-api",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "The questionaire API.",
   "main": "app.js",
   "scripts": {
