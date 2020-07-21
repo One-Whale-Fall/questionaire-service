@@ -34,7 +34,7 @@ const v1 = {
 
         server.route({
             method: 'GET',
-            path: '/questionaires/summary',
+            path: '/questionaires/conferences/score',
             options: {
                 description: 'Get questionaires scores of all conferences',
                 tags: ['api'],
