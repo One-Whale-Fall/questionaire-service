@@ -34,6 +34,21 @@ const v1 = {
 
         server.route({
             method: 'GET',
+            path: '/questionaires/summary',
+            options: {
+                description: 'Get questionaires scores of all conferences',
+                tags: ['api'],
+                validate: {
+                    headers: commonHeaders,
+                    failAction: sendValidationFailResponse
+                },
+                response: questionaireSchema.questionairesSummaryResponse,
+                handler: getQuestionairesSummary
+            }
+        });
+
+        server.route({
+            method: 'GET',
             path: '/questionaires/{conferenceId}',
             options: {
                 description: 'Retrieve questionaire for conference.',
@@ -66,21 +81,6 @@ const v1 = {
                 },
                 response: questionaireSchema.submitQuestionaireReponse,
                 handler: submitQuestionaire
-            }
-        });
-
-        server.route({
-            method: 'GET',
-            path: '/questionaires/summary',
-            options: {
-                description: 'Get questionaires scores of all conferences',
-                tags: ['api'],
-                validate: {
-                    headers: commonHeaders,
-                    failAction: sendValidationFailResponse
-                },
-                response: questionaireSchema.questionairesSummaryResponse,
-                handler: getQuestionairesSummary
             }
         });
     }
