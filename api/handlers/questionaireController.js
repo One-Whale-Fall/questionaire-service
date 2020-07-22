@@ -176,8 +176,7 @@ const generateQuestionaire = async function (request, h) {
     try {
         return await onGenerateQuestionaire(request, h);
     } catch (error) {
-        console.log('>>>>', error)
-        // request.log('error', error);
+        request.log('error', error);
         throw Boom.internal();
     }
 };
@@ -210,9 +209,160 @@ const getQuestionairesSummary = async function (request, h) {
     }
 };
 
+const onGetQuestionaireSummaryByConferenceId = async function (request, h) {
+  
+    const mongoDbClient = await request.server.methods.getDbClient();
+    const db = mongoDbClient.db(Config.dbName);
+    const collection = db.collection(constants.QUESTIONAIRE_COLLECTION);
+    const existingQuestionaire = await collection.findOne({
+        conferenceId: request.params.conferenceId
+    });
+    if (existingQuestionaire) {
+        const { questionItems } = existingQuestionaire;
+        const primaryScore = {
+            academic: {
+              questions: [],
+              fullScore: 0,
+              score: 0
+            },
+            achivement: {
+              questions: [],
+              fullScore: 0,
+              score: 0
+            },
+            organization: {
+              questions: [],
+              fullScore: 0,
+              score: 0
+            }
+        }
+        const secondaryScore = {
+            topic: {
+              questions: [],
+              fullScore: 0,
+              score: 0
+            },
+            reporter: {
+              questions: [],
+              fullScore: 0,
+              score: 0
+            },
+            interaction: {
+              questions: [],
+              fullScore: 0,
+              score: 0
+            },
+            thesis: {
+              questions: [],
+              fullScore: 0,
+              score: 0
+            },
+            other: {
+              questions: [],
+              fullScore: 0,
+              score: 0
+            },
+            preConference: {
+              questions: [],
+              fullScore: 0,
+              score: 0
+            },
+            duringConference: {
+              questions: [],
+              fullScore: 0,
+              score: 0
+            }
+        }
+        const tertiaryScore = []
+        for (const questionItem of questionItems) {
+            const { options, weight, order } = questionItem;
+            const fullScore = weight ? Math.round(weight * 100 * 10) / 10 : 0;
+            let weightedResult = 0;
+            if (weight) {
+                const { totalVotes, itemTotal } = options.reduce((acc, option) => {
+                    const { num } = option;
+                    acc.totalVotes += num || 0;
+                    acc.itemTotal += (option.num || 0) * 25 * (option.order - 1);
+                    return acc;
+                }, { totalVotes: 0, itemTotal: 0 });
+                weightedResult = Math.round(itemTotal / totalVotes * weight * 100) / 100;
+            }
+            if (questionItem.order < 10) {
+                primaryScore.academic.questions.push(questionItem.order);
+                primaryScore.academic.score += weightedResult;
+                primaryScore.academic.fullScore += fullScore;
+                if (questionItem.order < 4) {
+                    secondaryScore.topic.questions.push(questionItem.order);
+                    secondaryScore.topic.score += weightedResult;
+                    secondaryScore.topic.fullScore += fullScore;
+                } else if (questionItem.order < 6) {
+                    secondaryScore.reporter.questions.push(questionItem.order);
+                    secondaryScore.reporter.score += weightedResult;
+                    secondaryScore.reporter.fullScore += fullScore;
+                } else {
+                    secondaryScore.interaction.questions.push(questionItem.order);
+                    secondaryScore.interaction.score += weightedResult;
+                    secondaryScore.interaction.fullScore += fullScore;
+                }
+            } else if (questionItem.order < 14) {
+                primaryScore.achivement.questions.push(questionItem.order);
+                primaryScore.achivement.score += weightedResult;
+                primaryScore.achivement.fullScore += fullScore;
+                if (questionItem.order < 12) {
+                    secondaryScore.thesis.questions.push(questionItem.order);
+                    secondaryScore.thesis.score += weightedResult;
+                    secondaryScore.thesis.fullScore += fullScore;
+                } else {
+                    secondaryScore.other.questions.push(questionItem.order);
+                    secondaryScore.other.score += weightedResult;
+                    secondaryScore.other.fullScore += fullScore;
+                }
+            } else {
+                primaryScore.organization.questions.push(questionItem.order);
+                primaryScore.organization.score += weightedResult;
+                primaryScore.organization.fullScore += fullScore;
+                if (questionItem.order < 17) {
+                    secondaryScore.preConference.questions.push(questionItem.order);
+                    secondaryScore.preConference.score += weightedResult;
+                    secondaryScore.preConference.fullScore += fullScore;
+                } else {
+                    secondaryScore.duringConference.questions.push(questionItem.order);
+                    secondaryScore.duringConference.score += weightedResult;
+                    secondaryScore.duringConference.fullScore += fullScore;
+                }
+            }
+            tertiaryScore.push({
+                id: questionItem.id,
+                order,
+                name: questionItem.name,
+                fullScore,
+                score: weightedResult
+            });
+        }
+        return {
+            primaryScore,
+            secondaryScore,
+            tertiaryScore
+        }
+    } else {
+        h.response('questionaire not found ').code(404);
+    }
+}
+
+const getQuestionaireSummaryByConferenceId = async function (request, h) {
+
+    try {
+        return await onGetQuestionaireSummaryByConferenceId(request, h)
+    } catch(error) {
+        request.log('error', error);
+        throw Boom.internal()
+    }
+};
+
 module.exports = {
     getQuestionaire,
     submitQuestionaire,
     generateQuestionaire,
-    getQuestionairesSummary
+    getQuestionairesSummary,
+    getQuestionaireSummaryByConferenceId
 };

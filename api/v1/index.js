@@ -7,7 +7,11 @@ const { sendValidationFailResponse } = require('../handlers/utils.js');
 const questionaireSchema = require('../schemas/questionaireSchema.js');
 const { commonHeaders } = require('../schemas/common.js');
 const {
-    getQuestionaire, submitQuestionaire, generateQuestionaire, getQuestionairesSummary
+    getQuestionaire, 
+    submitQuestionaire, 
+    generateQuestionaire, 
+    getQuestionairesSummary,
+    getQuestionaireSummaryByConferenceId
 } = require('../handlers/questionaireController.js');
 
 const v1 = {
@@ -64,6 +68,24 @@ const v1 = {
                 handler: getQuestionaire
             }
         });
+
+        server.route({
+            method: 'GET',
+            path: '/questionaires/{conferenceId}/summary',
+            options: {
+                description: 'Get questionaire score of given conference',
+                tags: ['api'],
+                validate: {
+                    headers: commonHeaders,
+                    params: Joi.object({
+                        conferenceId: Joi.string().required()
+                    }),
+                    failAction: sendValidationFailResponse
+                },
+                response: questionaireSchema.questionaireSummaryByConferenceIdResponse,
+                handler: getQuestionaireSummaryByConferenceId
+            }
+        })
 
         server.route({
             method: 'POST',

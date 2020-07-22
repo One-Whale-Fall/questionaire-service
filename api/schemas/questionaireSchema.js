@@ -102,6 +102,42 @@ const questionairesSummaryResponse = {
     failAction: Config.responseFailValidationAction
 };
 
+const targetScore = Joi.object({
+    questions: Joi.array().items(Joi.number()),
+    fullScore: Joi.number(),
+    score: Joi.number()
+})
+
+const questionaireSummaryByConferenceIdResponse = {
+
+    status: {
+        200: Joi.object({
+            primaryScore: Joi.object({
+                academic: targetScore,
+                achivement: targetScore,
+                organization: targetScore
+            }),
+            secondaryScore: Joi.object({
+                topic: targetScore, 
+                reporter: targetScore, 
+                interaction: targetScore,
+                thesis: targetScore,
+                other: targetScore,
+                preConference: targetScore,
+                duringConference: targetScore
+            }),
+            tertiaryScore: Joi.array().items(Joi.object({
+                id: Joi.string(),
+                order: Joi.number(),
+                name: Joi.string(),
+                fullScore: Joi.number(),
+                score: Joi.number()
+            }))
+        })
+    },
+    failAction: Config.responseFailValidationAction
+}
+
 module.exports = {
 
     submitQuestionaireRequest,
@@ -109,5 +145,6 @@ module.exports = {
     submitQuestionaireReponse,
     generateQuestionaireResponse,
     questionaireResultResponse,
-    questionairesSummaryResponse
+    questionairesSummaryResponse,
+    questionaireSummaryByConferenceIdResponse
 };
