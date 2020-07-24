@@ -138,6 +138,13 @@ const questionaireSummaryByConferenceIdResponse = {
     failAction: Config.responseFailValidationAction
 }
 
+const exportQuestionaireSummaryByConferenceIdResponse = {
+  status: {
+      200: Joi.any()
+  },
+  failAction: Config.responseFailValidationAction
+};
+
 module.exports = {
 
     submitQuestionaireRequest,
@@ -146,5 +153,6 @@ module.exports = {
     generateQuestionaireResponse,
     questionaireResultResponse,
     questionairesSummaryResponse,
-    questionaireSummaryByConferenceIdResponse
+    questionaireSummaryByConferenceIdResponse,
+    exportQuestionaireSummaryByConferenceIdResponse
 };

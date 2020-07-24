@@ -11,7 +11,8 @@ const {
     submitQuestionaire, 
     generateQuestionaire, 
     getQuestionairesSummary,
-    getQuestionaireSummaryByConferenceId
+    getQuestionaireSummaryByConferenceId,
+    exportQuestionaireSummaryByConferenceId
 } = require('../handlers/questionaireController.js');
 
 const v1 = {
@@ -85,7 +86,25 @@ const v1 = {
                 response: questionaireSchema.questionaireSummaryByConferenceIdResponse,
                 handler: getQuestionaireSummaryByConferenceId
             }
-        })
+        });
+
+        server.route({
+            method: 'GET',
+            path: '/questionaires/{conferenceId}/summary/export',
+            options: {
+                description: 'Export questionaire score of given conference',
+                tags: ['api'],
+                validate: {
+                    headers: commonHeaders,
+                    params: Joi.object({
+                        conferenceId: Joi.string().required()
+                    }),
+                    failAction: sendValidationFailResponse
+                },
+                response: questionaireSchema.exportQuestionaireSummaryByConferenceIdResponse,
+                handler: exportQuestionaireSummaryByConferenceId
+            }
+        });
 
         server.route({
             method: 'POST',

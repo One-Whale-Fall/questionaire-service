@@ -27,6 +27,7 @@
     "@hapi/vision": "^6.0.0",
     "@hapi/wreck": "^17.0.0",
     "bcrypt": "^4.0.1",
+    "csv": "^5.3.2",
     "faker": "^4.1.0",
     "hapi-pino": "^8.0.0",
     "hapi-swagger": "^12.1.0",

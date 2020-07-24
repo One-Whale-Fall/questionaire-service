@@ -9,6 +9,8 @@ const constants = require('../constants.js');
 const Utils = require('../handlers/utils.js');
 const QRCode = require('qrcode')
 const { omit } = require('lodash')
+const Util = require('util');
+const CsvGenerate = Util.promisify(require('csv-stringify'));
 
 const updateQuestionaireStats = function (questionaire, submission) {
 
@@ -345,24 +347,96 @@ const onGetQuestionaireSummaryByConferenceId = async function (request, h) {
             tertiaryScore
         }
     } else {
-        h.response('questionaire not found ').code(404);
+        return h.response('questionaire not found ').code(404);
     }
 }
 
 const getQuestionaireSummaryByConferenceId = async function (request, h) {
 
     try {
-        return await onGetQuestionaireSummaryByConferenceId(request, h)
+        return await onGetQuestionaireSummaryByConferenceId(request, h);
+    } catch(error) {
+        request.log('error', error);
+        throw Boom.internal();
+    }
+};
+
+const onExportQuestionaireSummaryByConferenceId = async function (request, h) {
+    const { primaryScore, secondaryScore, tertiaryScore } = await onGetQuestionaireSummaryByConferenceId(request, h);
+    for (const item in secondaryScore) {
+      const { questions, score } = secondaryScore[item];
+      const filteredTertiaryItems = tertiaryScore.filter(item => questions.includes(item.order));
+      secondaryScore[item].tertiaryItems = filteredTertiaryItems;
+      secondaryScore[item].name = targetMap[item];
+      secondaryScore[item].score = Math.round(score * 100) / 100;
+    }
+    for (const item in primaryScore) {
+      const { questions, score } = primaryScore[item];
+      primaryScore[item].secondaryItems = [];
+      primaryScore[item].score = Math.round(score * 100) / 100;
+      primaryScore[item].name = targetMap[item];
+      for (const secondaryItem in secondaryScore) {
+        const secondaryQuestions = secondaryScore[secondaryItem].questions;
+        const isPrimarySubset = secondaryQuestions.every(questionId => questions.includes(questionId));
+        if (isPrimarySubset) {
+          primaryScore[item].secondaryItems.push(secondaryScore[secondaryItem]);
+        }
+      }
+    }
+    const rows = [];
+    rows.push(['一级指标', '二级指标', '三级指标', '满分', '得分']);
+    for (const key in primaryScore) {
+      let includePrimary = true;
+      const primaryName = primaryScore[key].name;
+      const { secondaryItems } = primaryScore[key];
+      for (const secondaryItem of secondaryItems) {
+        let includeSecondary = true;
+        const { tertiaryItems } = secondaryItem;
+        tertiaryItems.forEach(item => {
+          const primaryScoreDisplay = `${primaryName} (${primaryScore[key].score}分/ ${primaryScore[key].fullScore}分)`;
+          const secondaryScoreDisplay = `${secondaryItem.name} (${secondaryItem.score}分/ ${secondaryItem.fullScore}分)`;
+          const row = [`${item.order}.${item.name}`, item.fullScore, item.score];
+          row.unshift(includeSecondary ? secondaryScoreDisplay : '');
+          row.unshift(includePrimary ? primaryScoreDisplay : '');
+          rows.push(row);
+          includeSecondary = false;
+          includePrimary = false;
+        })
+      }
+    }
+    const csv = await CsvGenerate(rows);
+    return h.response(csv).header('content-type', 'text/csv').code(200);
+}
+
+const targetMap = {
+  academic: '学术吸引力',
+  achivement: '学术成果',
+  organization: '会务组织',
+  topic: '主题/\报告',
+  reporter: '报告人',
+  interaction: '交流互动',
+  thesis: '论文',
+  other: '其他',
+  preConference: '会前',
+  duringConference: '会中'
+}
+
+
+const exportQuestionaireSummaryByConferenceId = async function (request, h) {
+
+    try {
+        return await onExportQuestionaireSummaryByConferenceId(request, h);
     } catch(error) {
         request.log('error', error);
         throw Boom.internal()
     }
-};
+}
 
 module.exports = {
     getQuestionaire,
     submitQuestionaire,
     generateQuestionaire,
     getQuestionairesSummary,
-    getQuestionaireSummaryByConferenceId
+    getQuestionaireSummaryByConferenceId,
+    exportQuestionaireSummaryByConferenceId
 };
